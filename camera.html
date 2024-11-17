@@ -330,6 +330,42 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+        // Abstracted method to handle mouse or touch interactions
+function updatePointerPosition(x, y) {
+    mouse.x = (x / window.innerWidth) * 2 - 1;
+    mouse.y = -(y / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hoverObjects);
+
+    if (intersects.length > 0) {
+        const hovered = intersects[0].object;
+        const { name, description } = hovered.userData;
+        infoBox.style.display = "block";
+        infoBox.style.left = `${x + 10}px`;
+        infoBox.style.top = `${y + 10}px`;
+        infoBox.innerText = `${name}: ${description}`;
+    } else {
+        infoBox.style.display = "none";
+    }
+}
+
+// Touchstart and touchmove handlers
+function onTouchMove(event) {
+    if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        updatePointerPosition(touch.clientX, touch.clientY);
+    }
+}
+
+// Add event listeners for touch devices
+window.addEventListener("touchstart", onTouchMove);
+window.addEventListener("touchmove", onTouchMove);
+
+function onMouseMove(event) {
+    updatePointerPosition(event.clientX, event.clientY);
+}
+
 
         camera.position.set(0, 0, 100);
         animate();
